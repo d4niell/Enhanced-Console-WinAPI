@@ -27,6 +27,7 @@ void AddControls(HWND);
 struct
 {
 public:
+    
     wchar_t ConsoleText[100];
 }global;
 
@@ -199,7 +200,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 setvbuf(hf_in, NULL, _IONBF, 128);
                 *stdin = *hf_in;
                 system("title Console");
-
+              
             
             }
             case WINDOW_BUTTON_2:
@@ -371,9 +372,12 @@ void AddMenus(HWND hWnd)
 
 
 }
+
 void AddControls(HWND hWnd)
 {
- 
+
+
+
     CreateWindowW(L"Static", version, WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
     CreateWindowW(L"Static", L"->", WS_CHILD | WS_VISIBLE, 200, 160, 20, 15, hWnd, NULL, NULL, NULL);
     console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
