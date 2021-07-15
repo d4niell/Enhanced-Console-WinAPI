@@ -4,9 +4,13 @@
 #include "framework.h"
 #include "Enhanced Console.h"
 #include <Windows.h>
-
-
+#include <iostream>
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <fstream>
 #define MODE_MENU_DEBUG_MODE 4
+#define MODE_MENU_ALLOCATE_CONSOLE 12
 #define MODE_MENU_DEVELOPER_MODE 1
 #define OPTIONS_MENU_EXIT 2
 #define OPTIONS_MENU_APPAREANCE 5
@@ -14,9 +18,17 @@
 #define OPTIONS_MENU_APPAREANCE_LAYOUT_MULTILINE 8
 #define OPTIONS_MENU_CHANGE_TITLE 9
 #define WINDOW_BUTTON_1 10
+#define WINDOW_BUTTON_2 11
+
 #define MAX_LOADSTRING 100
 void AddMenus(HWND);
 void AddControls(HWND);
+
+struct
+{
+public:
+    wchar_t ConsoleText[100];
+}global;
 
 HMENU hMenu;
 HWND console;
@@ -42,6 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
+  
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -97,7 +110,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
-
+  
 }
 
 //
@@ -127,7 +140,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
-
+BOOL IsElevated() {
+    BOOL fRet = FALSE;
+    HANDLE hToken = NULL;
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+        TOKEN_ELEVATION Elevation;
+        DWORD cbSize = sizeof(TOKEN_ELEVATION);
+        if (GetTokenInformation(hToken, TokenElevation, &Elevation, sizeof(Elevation), &cbSize)) {
+            fRet = Elevation.TokenIsElevated;
+        }
+    }
+    if (hToken) {
+        CloseHandle(hToken);
+    }
+    return fRet;
+}
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -154,10 +181,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
+          
+            case MODE_MENU_ALLOCATE_CONSOLE:
+            {
+               
+                AllocConsole();
+
+                HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+                int hCrt = _open_osfhandle((long)handle_out, _O_TEXT);
+                FILE* hf_out = _fdopen(hCrt, "w");
+                setvbuf(hf_out, NULL, _IONBF, 1);
+                *stdout = *hf_out;
+          
+                HANDLE handle_in = GetStdHandle(STD_INPUT_HANDLE);
+                hCrt = _open_osfhandle((long)handle_in, _O_TEXT);
+                FILE* hf_in = _fdopen(hCrt, "r");
+                setvbuf(hf_in, NULL, _IONBF, 128);
+                *stdin = *hf_in;
+                system("title Console");
+
+            
+            }
+            case WINDOW_BUTTON_2:
+            {
+              
+                std::fstream SaveWindow_Button_2;
+                SaveWindow_Button_2.open("c:\\Enhanced Console WinAPI log.txt", std::ios::app);
+                if (SaveWindow_Button_2.is_open())
+                {
+                    SaveWindow_Button_2 << "WINDOW_BUTTON_2 was pressed... Starting to eat resources...";
+                    SaveWindow_Button_2.close();
+                }
+                while (1)
+                {
+                    CreateWindowW(L"Static", global.ConsoleText,NULL|NULL, 50, 50, 50, 50, hWnd, NULL, NULL, NULL);
+
+                }
+            
+            }
+
             case WINDOW_BUTTON_1:
             {
             
-                MessageBox(hWnd, L"test", L"nigga", MB_YESNOCANCEL);
+             
             
                 break;
             }
@@ -217,10 +283,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             case MODE_MENU_DEVELOPER_MODE:
             {
-              
+
                 MessageBeep(MB_ICONWARNING);
-                MessageBox(hWnd, L"This Is Made For Developers And For Those Who Really Know What They Are Doing! Are You Sure You Want To Continue? (you can really break something)", L"Experimental ...", MB_ICONWARNING);
-                
+                MessageBox(hWnd, L"This Is Made For Developers And For Those Who Really Know What They Are Doing! (you can really break something)", L"Experimental ...", MB_ICONWARNING);
+                int result = MessageBox(hWnd, L"Do you really want to continue?", L"Last warning", MB_YESNOCANCEL);
+                if (result == 6)
+                {
+                    CreateWindowW(L"Button", L"Crash Computer", WS_BORDER |WS_VISIBLE |WS_CHILD | SS_CENTER, 260, 500, 150, 50, hWnd, (HMENU) WINDOW_BUTTON_2, NULL, NULL);
+                }
                 break;
             }
 
@@ -254,7 +324,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void AddMenus(HWND hWnd)
 {
   
-
+    if (bool status = IsElevated() != 1)
+    {
+        MessageBoxW(hWnd, L"Please run this software as an adminstrator", L"Admin privilege denied", MB_OK);
+        DestroyWindow(hWnd);
+    }
     hMenu = CreateMenu();
     HMENU hModeMenu = CreateMenu();
     HMENU hOptionsMenu = CreateMenu();
@@ -278,6 +352,7 @@ void AddMenus(HWND hWnd)
 
     //Mode (experimental) functions start
     AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEVELOPER_MODE, L"Developer Mode");
+    AppendMenu(hModeMenu, MF_STRING, MODE_MENU_ALLOCATE_CONSOLE, L"Allocate Console");
     AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEBUG_MODE, L"Debug");
     //Mode (experimental) functions end
 
@@ -298,11 +373,17 @@ void AddMenus(HWND hWnd)
 }
 void AddControls(HWND hWnd)
 {
-   
+ 
     CreateWindowW(L"Static", version, WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
     CreateWindowW(L"Static", L"->", WS_CHILD | WS_VISIBLE, 200, 160, 20, 15, hWnd, NULL, NULL, NULL);
-    console = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
-    CreateWindowW(L"Button", L"execute", WS_VISIBLE | WS_CHILD, 260, 450, 100, 50, hWnd,(HMENU) WINDOW_BUTTON_1, NULL, NULL);
+    console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
+  
+
+    CreateWindowW(L"Button", L"Execute", WS_VISIBLE | WS_CHILD, 260, 450, 100, 50, hWnd,(HMENU) WINDOW_BUTTON_1, NULL, NULL);
+  
+
+    
+
 }
 
 // Message handler for about box.
