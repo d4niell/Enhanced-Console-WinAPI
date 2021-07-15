@@ -6,6 +6,8 @@
 #include <Windows.h>
 
 #define MODE_MENU_DEVELOPER_MODE 1
+#define MODE_MENU_DEFAULT_MODE 3
+#define OPTIONS_MENU 2
 #define MAX_LOADSTRING 100
 void AddMenus(HWND);
 
@@ -141,9 +143,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-            case 2:
+            case 3:
             {
                 MessageBeep(MB_OK);
+                MessageBox(hWnd, L"Mode Has Been Changed Back To Default Mode!", L"Mode Selection ...", MB_OK);
+                break;
+            }
+            case 2:
+            {
+
+                MessageBeep(MB_ICONWARNING);
                 DestroyWindow(hWnd);
             
             }
@@ -151,7 +160,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
               
                 MessageBeep(MB_ICONWARNING);
-                MessageBox(hWnd, L"This Is Made For Developers And For Those Who Really Know What They Are Doing! Are You Sure You Want To Continue? (you can really break something)", L"Experimental ...", MB_YESNO);
+                MessageBox(hWnd, L"This Is Made For Developers And For Those Who Really Know What They Are Doing! Are You Sure You Want To Continue? (you can really break something)", L"Experimental ...", MB_ICONWARNING);
                 
                 break;
             }
@@ -189,9 +198,23 @@ void AddMenus(HWND hWnd)
 
     hMenu = CreateMenu();
     HMENU hModeMenu = CreateMenu();
+    HMENU hOptionsMenu = CreateMenu();
+
+    //Mode (experimental) functions start
     AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEVELOPER_MODE, L"Developer Mode");
+    AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEFAULT_MODE, L"Default Mode");
+    AppendMenu(hModeMenu, MF_SEPARATOR, NULL, NULL);
+    //Mode (experimental) functions end
+
+
+
+    //Options functions start
+    AppendMenu(hOptionsMenu, MF_STRING, OPTIONS_MENU, L"Exit Enhanced Console");
+    //Options function end
+
+
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR) hModeMenu, L"Mode (experimental)");
-    AppendMenu(hMenu, NULL, 2, L"Exit Enhanced Console");
+    AppendMenu(hMenu, MF_POPUP, (UINT_PTR) hOptionsMenu, L" Options");
     SetMenu(hWnd, hMenu);
 
 
