@@ -8,14 +8,20 @@
 
 #define MODE_MENU_DEBUG_MODE 4
 #define MODE_MENU_DEVELOPER_MODE 1
-#define MODE_MENU_DEFAULT_MODE 3
 #define OPTIONS_MENU_EXIT 2
 #define OPTIONS_MENU_APPAREANCE 5
 #define OPTIONS_MENU_APPAREANCE_COLOR 6
+#define OPTIONS_MENU_APPAREANCE_LAYOUT_MULTILINE 8
+#define OPTIONS_MENU_CHANGE_TITLE 9
+#define WINDOW_BUTTON_1 10
 #define MAX_LOADSTRING 100
 void AddMenus(HWND);
 void AddControls(HWND);
+
 HMENU hMenu;
+HWND console;
+HWND title;
+LPCWSTR version = L"V.00.3";
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -148,29 +154,60 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-           
-            case OPTIONS_MENU_APPAREANCE_COLOR:
+            case WINDOW_BUTTON_1:
             {
             
-                MessageBeep(MB_OK);
+                MessageBox(hWnd, L"test", L"nigga", MB_YESNOCANCEL);
+            
                 break;
             }
 
+            case OPTIONS_MENU_CHANGE_TITLE: //bug
+            {
+                wchar_t text[100];
+                title = CreateWindowW(L"Edit", NULL, WS_VISIBLE | SS_LEFT, 250, 250, 50, 100, title, NULL, NULL, NULL);
+             
+                GetWindowTextW(title, text, 100);
+                if (!text != 0)
+                {
+                    SetWindowTextW(hWnd, text);
+
+                }
+               
+                break;
+            }
+         
+            case OPTIONS_MENU_APPAREANCE_LAYOUT_MULTILINE:
+            {
+            
+                MessageBox(hWnd, L"Do you want to enable multilining?", L"Multiline", MB_YESNOCANCEL);
+                DestroyWindow(console);
+                console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT | ES_MULTILINE, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
+                break;
+            
+         
+           
+            }
+            
+            case OPTIONS_MENU_APPAREANCE_COLOR:
+            {
+            
+                
+                MessageBeep(MB_OK);
+                break;
+            }
+            
                
             
             case MODE_MENU_DEBUG_MODE:
             {
+              
                 MessageBeep(MB_ICONINFORMATION);
-                MessageBox(hWnd, L"Do you really want to enable Debug mode?", L"Mode Selection ...", MB_ICONQUESTION);
+                MessageBox(hWnd, L"Do you really want to enable Debug mode?", L"Mode Selection ...", MB_YESNOCANCEL);
                 break;
             
             }
-            case 3:
-            {
-                MessageBeep(MB_OK);
-                MessageBox(hWnd, L"Mode Has Been Changed Back To Default Mode!", L"Mode Selection ...", MB_OK);
-                break;
-            }
+           
             case OPTIONS_MENU_EXIT:
             {
 
@@ -216,27 +253,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 void AddMenus(HWND hWnd)
 {
-
+  
 
     hMenu = CreateMenu();
     HMENU hModeMenu = CreateMenu();
     HMENU hOptionsMenu = CreateMenu();
     HMENU hSubOptionsMenu = CreateMenu();
     HMENU hSubColorMenu = CreateMenu();
+    HMENU hSubLayoutMenu = CreateMenu();
 
+    AppendMenu(hSubLayoutMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_LAYOUT_MULTILINE, L"Multiline");
+    
     AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Red");
     AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Green");
     AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Blue");
+    
+    
     //Appareance Sub Options Menu start
     AppendMenu(hSubOptionsMenu, MF_POPUP, (UINT_PTR) hSubColorMenu, L"Color");
-    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_APPAREANCE, L"Layout");
+    AppendMenu(hSubOptionsMenu, MF_POPUP, (UINT_PTR) hSubLayoutMenu, L"Layout");
+    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_CHANGE_TITLE, L"Change Title");
 
     //Appareance Sub Options Menu end
 
     //Mode (experimental) functions start
     AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEVELOPER_MODE, L"Developer Mode");
-    AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEFAULT_MODE, L"Default Mode");
-    AppendMenu(hModeMenu, MF_SEPARATOR, NULL, NULL);
     AppendMenu(hModeMenu, MF_STRING, MODE_MENU_DEBUG_MODE, L"Debug");
     //Mode (experimental) functions end
 
@@ -257,9 +298,11 @@ void AddMenus(HWND hWnd)
 }
 void AddControls(HWND hWnd)
 {
-    CreateWindowW(L"Static", L"V.00.1", WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
-  
-    CreateWindowW(L"Edit", L"Console", WS_VISIBLE  | WS_CHILD| WS_BORDER | SS_LEFT, 220, 160, 250, 250, hWnd, NULL, NULL, NULL);
+   
+    CreateWindowW(L"Static", version, WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
+    CreateWindowW(L"Static", L"->", WS_CHILD | WS_VISIBLE, 200, 160, 20, 15, hWnd, NULL, NULL, NULL);
+    console = CreateWindowW(L"Edit", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
+    CreateWindowW(L"Button", L"execute", WS_VISIBLE | WS_CHILD, 260, 450, 100, 50, hWnd,(HMENU) WINDOW_BUTTON_1, NULL, NULL);
 }
 
 // Message handler for about box.
