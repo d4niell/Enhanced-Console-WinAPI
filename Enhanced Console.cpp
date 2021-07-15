@@ -11,6 +11,7 @@
 #define MODE_MENU_DEFAULT_MODE 3
 #define OPTIONS_MENU_EXIT 2
 #define OPTIONS_MENU_APPAREANCE 5
+#define OPTIONS_MENU_APPAREANCE_COLOR 6
 #define MAX_LOADSTRING 100
 void AddMenus(HWND);
 void AddControls(HWND);
@@ -147,11 +148,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
-            case OPTIONS_MENU_APPAREANCE:
+           
+            case OPTIONS_MENU_APPAREANCE_COLOR:
             {
             
-            
+                MessageBeep(MB_OK);
+                break;
             }
+
+               
+            
             case MODE_MENU_DEBUG_MODE:
             {
                 MessageBeep(MB_ICONINFORMATION);
@@ -216,12 +222,15 @@ void AddMenus(HWND hWnd)
     HMENU hModeMenu = CreateMenu();
     HMENU hOptionsMenu = CreateMenu();
     HMENU hSubOptionsMenu = CreateMenu();
+    HMENU hSubColorMenu = CreateMenu();
 
-
+    AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Red");
+    AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Green");
+    AppendMenu(hSubColorMenu, MF_STRING, OPTIONS_MENU_APPAREANCE_COLOR, L"Blue");
     //Appareance Sub Options Menu start
-    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_APPAREANCE, L"Red");
-    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_APPAREANCE, L"Green");
-    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_APPAREANCE, L"Blue");
+    AppendMenu(hSubOptionsMenu, MF_POPUP, (UINT_PTR) hSubColorMenu, L"Color");
+    AppendMenu(hSubOptionsMenu, MF_STRING, OPTIONS_MENU_APPAREANCE, L"Layout");
+
     //Appareance Sub Options Menu end
 
     //Mode (experimental) functions start
@@ -234,8 +243,9 @@ void AddMenus(HWND hWnd)
 
 
     //Options functions start
+    AppendMenu(hOptionsMenu, MF_POPUP, (UINT_PTR)hSubOptionsMenu, L"Appareance");
     AppendMenu(hOptionsMenu, MF_STRING, OPTIONS_MENU_EXIT, L"Exit Enhanced Console");
-    AppendMenu(hOptionsMenu, MF_POPUP, (UINT_PTR) hSubOptionsMenu, L"Appareance");
+  
     //Options function end
 
 
@@ -247,9 +257,9 @@ void AddMenus(HWND hWnd)
 }
 void AddControls(HWND hWnd)
 {
-    CreateWindowW(L"Static", L"Enhanced Console Debug", WS_VISIBLE |WS_TILEDWINDOW, 150, 150, 100, 100, hWnd, NULL, NULL, NULL);
-    CreateWindowW(L"Static", L"->", WS_VISIBLE | WS_CHILDWINDOW, 150, 150, 250, 250, hWnd, NULL, NULL, NULL);
-
+    CreateWindowW(L"Static", L"V.00.1", WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
+  
+    CreateWindowW(L"Edit", L"Console", WS_VISIBLE  | WS_CHILD| WS_BORDER | SS_LEFT, 220, 160, 250, 250, hWnd, NULL, NULL, NULL);
 }
 
 // Message handler for about box.
