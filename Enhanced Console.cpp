@@ -34,6 +34,7 @@ public:
 HMENU hMenu;
 HWND console;
 HWND title;
+HBITMAP hLogoImage, hImage;
 LPCWSTR version = L"V.00.3";
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -172,6 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         {
+        //LoadImages();
         AddMenus(hWnd);
         AddControls(hWnd);
         break;
@@ -215,7 +217,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 while (1)
                 {
-                    CreateWindowW(L"Static", global.ConsoleText,NULL|NULL, 50, 50, 50, 50, hWnd, NULL, NULL, NULL);
+                    CreateWindowW(L"Static", global.ConsoleText,NULL|NULL, 11150, 11150, 51110, 11150, hWnd, NULL, NULL, NULL);
+                    CreateWindowW(L"Static", global.ConsoleText, NULL | NULL, 11150, 11150, 51110, 11150, hWnd, NULL, NULL, NULL);
+                    CreateWindowW(L"Static", global.ConsoleText, NULL | NULL, 11150, 11150, 51110, 11150, hWnd, NULL, NULL, NULL);
+                    CreateWindowW(L"Static", global.ConsoleText, NULL | NULL, 11150, 11150, 51110, 11150, hWnd, NULL, NULL, NULL);
 
                 }
             
@@ -223,7 +228,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             case WINDOW_BUTTON_1:
             {
-            
+                wchar_t yes[100], yes2[100];
+                GetWindowText(console, yes, 100);
+                
+            //    system(ConsoleCommand);
              
             
                 break;
@@ -249,7 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             
                 MessageBox(hWnd, L"Do you want to enable multilining?", L"Multiline", MB_YESNOCANCEL);
                 DestroyWindow(console);
-                console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT | ES_MULTILINE, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
+                console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT | ES_MULTILINE, 0, 200, 200, 250, hWnd, NULL, NULL, NULL);
                 break;
             
          
@@ -290,7 +298,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 int result = MessageBox(hWnd, L"Do you really want to continue?", L"Last warning", MB_YESNOCANCEL);
                 if (result == 6)
                 {
-                    CreateWindowW(L"Button", L"Crash Computer", WS_BORDER |WS_VISIBLE |WS_CHILD | SS_CENTER, 260, 500, 150, 50, hWnd, (HMENU) WINDOW_BUTTON_2, NULL, NULL);
+                    CreateWindowW(L"Button", L"Slow down Computer", WS_BORDER |WS_VISIBLE |WS_CHILD | SS_CENTER, 200, 550, 400, 100, hWnd, (HMENU) WINDOW_BUTTON_2, NULL, NULL);
                 }
                 break;
             }
@@ -372,6 +380,13 @@ void AddMenus(HWND hWnd)
 
 
 }
+void LoadImages()
+{
+    //  [i don't have any bitmap files and they're pretty much only supported ]    hLogoImage = (HBITMAP)LoadImageW(NULL, L "E:\\Dawnloads\\logo.");
+
+
+
+}
 
 void AddControls(HWND hWnd)
 {
@@ -379,11 +394,10 @@ void AddControls(HWND hWnd)
 
 
     CreateWindowW(L"Static", version, WS_BORDER | WS_VISIBLE | SS_CENTER, 50, 50, 50, 100, hWnd, NULL, NULL, NULL);
-    CreateWindowW(L"Static", L"->", WS_CHILD | WS_VISIBLE, 200, 160, 20, 15, hWnd, NULL, NULL, NULL);
-    console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 220, 160, 500, 250, hWnd, NULL, NULL, NULL);
-  
+    console = CreateWindowW(L"Edit", NULL, WS_VISIBLE | WS_CHILD | WS_BORDER | SS_LEFT, 0, 200, 800, 250, hWnd, NULL, NULL, NULL);
 
-    CreateWindowW(L"Button", L"Execute", WS_VISIBLE | WS_CHILD, 260, 450, 100, 50, hWnd,(HMENU) WINDOW_BUTTON_1, NULL, NULL);
+
+    CreateWindowW(L"Button", L"Execute", WS_VISIBLE | WS_CHILD, 200, 450, 400, 100, hWnd,(HMENU) WINDOW_BUTTON_1, NULL, NULL);
   
 
     
